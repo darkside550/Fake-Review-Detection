@@ -26,7 +26,7 @@ for i in range(2,len(record_data)):
         i += 1
         index_pos.append(i)
 #print(index_pos)
-
+#review extraction from google sheets
 pos_rev = []
 for j in index_pos:
     pos = f'H{str(j)}'
@@ -51,8 +51,25 @@ for i in range(len(raw_review)):
     filtered_sentence = (" ").join(tokens_without_sw)
     fil.append(filtered_sentence)
 
-print(fil)
+#print(fil)
+#review is free from stopwords
+pos_rate = []
+for j in index_pos:
+    pos = f'G{str(j)}'
+    pos_rate.append(pos)
 
+print(pos_rate)
+avg_rate = []
+for i in pos_rate:
+    rate_val = sheet_instance.acell(i).value
+    avg_rate.append(rate_val)
 
+#print(avg_rate)    
+sum_rating= 0
+for i in avg_rate:
+    sum_rating = sum_rating + int(i)
+    avg = sum_rating/len(avg_rate)
 
-    
+    user_rat = abs(float(i)-avg) / 5
+    if user_rat > 0.4:
+        print("Fake")
