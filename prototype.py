@@ -19,13 +19,25 @@ sheet = client.open('Dataset_fake_review')
 sheet_instance = sheet.get_worksheet(0)
 
 # get all the records of the data
-records_data = sheet_instance.get_all_records()
+index_pos = []
+record_data = sheet_instance.col_values('1')
+for i in range(2,len(record_data)):
+    if record_data[i] == 'OnePlus 8T':
+        i += 1
+        index_pos.append(i)
+#print(index_pos)
 
-#stop = stopwords.words('english')
+pos_rev = []
+for j in index_pos:
+    pos = f'H{str(j)}'
+    pos_rev.append(pos)
+
 raw_review = []
-for i in records_data:
-    #rev = i['reviews.text']
-    raw_review.append(i['reviews.text'])
+for i in pos_rev:
+    rev_val = sheet_instance.acell(i).value
+    raw_review.append(rev_val)
+
+#print(raw_review)
 
 fil = []
 for i in range(len(raw_review)):
@@ -34,7 +46,7 @@ for i in range(len(raw_review)):
 
     tokens_without_sw = [word for word in text_tokens if not word in stopwords.words()]
 
-    #print(tokens_without_sw)
+#    print(tokens_without_sw)
 
     filtered_sentence = (" ").join(tokens_without_sw)
     fil.append(filtered_sentence)
