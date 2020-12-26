@@ -20,58 +20,79 @@ class Prototype:
     def index_brands(self):
         self.index_pos = []
         record_data = sheet_instance.col_values('1')
+        
         for i in range(2,len(record_data)):
             if record_data[i] == 'OnePlus 8T':
                 i += 1
                 self.index_pos.append(i)
+        
         return self.index_pos
     #review extraction from google sheets
+    
     def review_extraction(self):
         pos_rev = []
+        
         for j in self.index_pos:
             pos = f'H{str(j)}'
             pos_rev.append(pos)
 
         raw_review = []
+        
         for i in pos_rev:
             rev_val = sheet_instance.acell(i).value
             raw_review.append(rev_val)
         #print(raw_review)
         self.word_review = []
+        
         for i in range(len(raw_review)):
             word = raw_review[i]
+
             text_tokens = word_tokenize(word)
+            
             tokens_without_sw = [word for word in text_tokens if not word in stopwords.words()]
         #   print(tokens_without_sw)
+            
             filtered_sentence = (" ").join(tokens_without_sw)
+            
             self.word_review.append(filtered_sentence)
 
         #print(self.word_review)
         return self.word_review
+    
     #review is free from stopwords
-    def lcs(self):
-        v = []
-        for X,Y in zip(self.word_review,self.word_review[1:]):
-            m = len(X)
-            n = len(Y)
-            
-        # declaring the array for storing the dp values 
-            L = [[None]*(n+1) for i in range(m+1)]
-            for i in range(m+1): 
-                for j in range(n+1): 
-                    if i == 0 or j == 0 : 
-                        L[i][j] = 0
-                    elif X[i-1] == Y[j-1]: 
-                        L[i][j] = L[i-1][j-1]+1
-                    else: 
-                        L[i][j] = max(L[i-1][j] , L[i][j-1]) 
+    def lcs(self,X,Y):
         
-            # L[m][n] contains the length of LCS of X[0..n-1] & Y[0..m-1]
-            lcs_test = L[m][n]
-            
-            #v.append(lcs_test)
-            v.append("{:.3f}".format(lcs_test / m))
-            v.append("{:.3f}".format(lcs_test / n))
+        m = len(X)
+        n = len(Y)
+        
+    # declaring the array for storing the dp values 
+        L = [[None]*(n+1) for i in range(m+1)]
+        for i in range(m+1): 
+            for j in range(n+1): 
+                if i == 0 or j == 0 : 
+                    L[i][j] = 0
+                elif X[i-1] == Y[j-1]: 
+                    L[i][j] = L[i-1][j-1]+1
+                else: 
+                    L[i][j] = max(L[i-1][j] , L[i][j-1]) 
+    
+
+        return L[m][n]
+
+    def comp_rev(self):
+        v = [0] * len(self.word_review)
+        for i in range(0,len(self.word_review)):
+            for j in range(i+1, len(self.word_review)):
+                res = self.lcs(self.word_review[i], self.word_review[j])
+                if(v[i] > (res/len(self.word_review[i]))):
+                    v[i] = v[i]
+                else:
+                    v[i] = res/len(self.word_review[i])
+                if(v[j] > (res/len(self.word_review[j]))):
+                    v[j] = v[j]
+                else:
+                    v[j] = res/len(self.word_review[j])
+
         print(v)
 
     def deviation_rate(self):
@@ -100,5 +121,5 @@ class Prototype:
 prop = Prototype()
 prop.index_brands()
 prop.review_extraction()
-prop.lcs()
+prop.comp_rev()
 prop.deviation_rate()
