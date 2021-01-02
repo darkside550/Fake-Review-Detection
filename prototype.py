@@ -28,7 +28,14 @@ class Prototype:
         
         return self.index_pos
     #review extraction from google sheets
-    
+    def user_array(self):
+        self.user = []
+        user_record = sheet_instance.col_values('9')
+        #print(user_record)
+        for i in range(2,len(user_record)):
+            self.user.append(user_record[i])
+        print(list(set(self.user)))
+
     def review_extraction(self):
         pos_rev = []
         
@@ -93,7 +100,14 @@ class Prototype:
                 else:
                     v[j] = res/len(self.word_review[j])
 
-        print(v)
+        #print(v)
+        res = {}
+        for key in v:
+            for value in self.word_review:
+                res[key] = value
+                #v.remove(key)
+                break
+        print(str(res))
 
     def deviation_rate(self):
         pos_rate = []
@@ -101,7 +115,7 @@ class Prototype:
             pos = f'G{str(j)}'
             pos_rate.append(pos)
 
-        print(pos_rate)
+        #print(pos_rate)
         avg_rate = []
         for i in pos_rate:
             rate_val = sheet_instance.acell(i).value
@@ -118,8 +132,10 @@ class Prototype:
                 print("Fake")
             else:
                 print("Genuine")
+
 prop = Prototype()
 prop.index_brands()
+#prop.user_array()
 prop.review_extraction()
 prop.comp_rev()
-prop.deviation_rate()
+#prop.deviation_rate()
