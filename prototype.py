@@ -1,4 +1,5 @@
 import gspread
+from collections import defaultdict,Counter
 from oauth2client.service_account import ServiceAccountCredentials
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -32,10 +33,12 @@ class Prototype:
         self.user = []
         user_record = sheet_instance.col_values('9')
         #print(user_record)
-        for i in range(2,len(user_record)):
+        for i in range(1,len(user_record)):
             self.user.append(user_record[i])
-        print(list(set(self.user)))
-
+        
+        #print(list(set(self.user)))
+        #print(list(self.user))
+        return self.user
     def review_extraction(self):
         pos_rev = []
         
@@ -87,27 +90,39 @@ class Prototype:
         return L[m][n]
 
     def comp_rev(self):
-        v = [0] * len(self.word_review)
+        self.v = [0] * len(self.word_review)
         for i in range(0,len(self.word_review)):
             for j in range(i+1, len(self.word_review)):
                 res = self.lcs(self.word_review[i], self.word_review[j])
-                if(v[i] > (res/len(self.word_review[i]))):
-                    v[i] = v[i]
+                if(self.v[i] > (res/len(self.word_review[i]))):
+                    self.v[i] = self.v[i]
                 else:
-                    v[i] = res/len(self.word_review[i])
-                if(v[j] > (res/len(self.word_review[j]))):
-                    v[j] = v[j]
+                    self.v[i] = res/len(self.word_review[i])
+                if(self.v[j] > (res/len(self.word_review[j]))):
+                    self.v[j] = self.v[j]
                 else:
-                    v[j] = res/len(self.word_review[j])
+                    self.v[j] = res/len(self.word_review[j])
 
         #print(v)
-        res = {}
-        for key in v:
+    def dict_rev(self):
+        resu = {}
+        for key in self.v:
             for value in self.word_review:
-                res[key] = value
+                resu[key] = value
                 #v.remove(key)
                 break
-        print(str(res))
+        print(str(resu))
+
+    def bias_rate(self):
+        user_brand = defaultdict(list)
+        for i in range(2,len(self.user)+2):
+            user = f'I{str(i)}'
+            brand = f'C{str(i)}'
+            user_name = sheet_instance.acell(user).value
+            brand_name = sheet_instance.acell(brand).value
+
+            user_brand[user_name].append(brand_name)
+        print(str(user_brand))
 
     def deviation_rate(self):
         pos_rate = []
@@ -135,7 +150,9 @@ class Prototype:
 
 prop = Prototype()
 prop.index_brands()
-#prop.user_array()
+prop.user_array()
 prop.review_extraction()
 prop.comp_rev()
-#prop.deviation_rate()
+prop.dict_rev()
+prop.bias_rate()
+prop.deviation_rate()
