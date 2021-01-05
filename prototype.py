@@ -8,7 +8,7 @@ from nltk.corpus import stopwords
 scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
 
 # add credentials to the account
-creds = ServiceAccountCredentials.from_json_keyfile_name('My Project 28526-3e10c71c36ce.json', scope)
+creds = ServiceAccountCredentials.from_json_keyfile_name('My Project 28526-4e6d71d7758e.jso', scope)
 
 # authorize the clientsheet 
 client = gspread.authorize(creds)
@@ -39,6 +39,18 @@ class Prototype:
         #print(list(set(self.user)))
         #print(list(self.user))
         return self.user
+    
+    def brand_array(self):
+        self.brand_name = []
+        brand_record = sheet_instance.col_values('3')
+        #print(user_record)
+        for i in range(1,len(brand_record)):
+            self.brand_name.append(brand_record[i])
+        
+        #print(list(set(self.user)))
+        #print(list(self.user))
+        return self.brand_name
+
     def review_extraction(self):
         pos_rev = []
         
@@ -115,13 +127,10 @@ class Prototype:
 
     def bias_rate(self):
         user_brand = defaultdict(list)
-        for i in range(2,len(self.user)+2):
-            user = f'I{str(i)}'
-            brand = f'C{str(i)}'
-            user_name = sheet_instance.acell(user).value
-            brand_name = sheet_instance.acell(brand).value
-
-            user_brand[user_name].append(brand_name)
+        for i in range(0,len(self.user)):
+            user = self.user[i]    
+            brand_name = self.brand_name[i]
+            user_brand[user].append(brand_name)
         print(str(user_brand))
 
     def deviation_rate(self):
@@ -151,6 +160,7 @@ class Prototype:
 prop = Prototype()
 prop.index_brands()
 prop.user_array()
+prop.brand_array()
 prop.review_extraction()
 prop.comp_rev()
 prop.dict_rev()
